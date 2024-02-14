@@ -1,8 +1,9 @@
+"use strict";
 var Kanai;
 (function (Kanai) {
-    var Enums;
+    let Enums;
     (function (Enums) {
-        var Slots;
+        let Slots;
         (function (Slots) {
             Slots[Slots["Armor"] = 0] = "Armor";
             Slots[Slots["Weapon"] = 1] = "Weapon";
@@ -10,4 +11,3 @@ var Kanai;
         })(Slots = Enums.Slots || (Enums.Slots = {}));
     })(Enums = Kanai.Enums || (Kanai.Enums = {}));
 })(Kanai || (Kanai = {}));
-//# sourceMappingURL=slots.js.map

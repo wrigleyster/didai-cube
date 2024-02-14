@@ -278,7 +278,7 @@ module Kanai {
                     }, self);
                     this.checkConsistency();
                     this.saveToLocalStorage();
-                    $.each(self.Armor(), function (i, elem: Equipment) {
+                    const save = (i, elem: Equipment) => {
                         elem.isCubedSeason.subscribe((newValue) => {
                             self.saveToLocalStorage();
                         });
@@ -288,142 +288,79 @@ module Kanai {
                         elem.isStashed.subscribe((newValue) => {
                             self.saveToLocalStorage();
                         });
-                    });
-
-                    $.each(self.Weapons(), function (i, elem: Equipment) {
-                        elem.isCubedSeason.subscribe((newValue) => {
-                            self.saveToLocalStorage();
-                        });
-                        elem.isCubedNonSeason.subscribe((newValue) => {
-                            self.saveToLocalStorage();
-                        });
-                        elem.isStashed.subscribe((newValue) => {
-                            self.saveToLocalStorage();
-                        });
-                    });
-
-                    $.each(self.Jewelry(), function (i, elem: Equipment) {
-                        elem.isCubedSeason.subscribe((newValue) => {
-                            self.saveToLocalStorage();
-                        });
-                        elem.isCubedNonSeason.subscribe((newValue) => {
-                            self.saveToLocalStorage();
-                        });
-                        elem.isStashed.subscribe((newValue) => {
-                            self.saveToLocalStorage();
-                        });
-                    });
+                    }
+                    $.each(self.Armor(), save);
+                    $.each(self.Weapons(), save);
+                    $.each(self.Jewelry(), save);
                     this.saveToLocalStorage();
                 }
 
-                this.ArmorSeasonalCubedCount = ko.computed(() => {
-                    if (self.Armor().length > 0) {
-                        return ko.utils.arrayFilter(self.Armor(), function (item: Equipment) {
+                const seasonalCount = (getItems) => {
+                    return () => {
+                        if (getItems().length > 0) {
+                            return ko.utils.arrayFilter(getItems(), function (item: Equipment) {
+                                const elem = ko.unwrap(item);
+                                return elem.isCubedSeason();
+                            }).length;
+                        }
+                    };
+                };
+                this.ArmorSeasonalCubedCount = ko.computed(seasonalCount(self.Armor));
+                this.WeaponSeasonalCubedCount = ko.computed(seasonalCount(self.Weapons));
+                this.JewelrySeasonalCubedCount = ko.computed(seasonalCount(self.Jewelry));
+                const nonSeasonalCount = (getItems) => {
+                    return () => {
+                        if (getItems().length > 0) {
+                            return ko.utils.arrayFilter(getItems(), function (item: Equipment) {
+                                const elem = ko.unwrap(item);
+                                return elem.isCubedNonSeason();
+                            }).length;
+                        }
+                    };
+                };
+
+                this.ArmorNonSeasonalCubedCount = ko.computed(nonSeasonalCount(self.Armor));
+                this.WeaponNonSeasonalCubedCount = ko.computed(nonSeasonalCount(self.Weapons));
+                this.JewelryNonSeasonalCubedCount = ko.computed(nonSeasonalCount(self.Jewelry));
+
+                const stashedCount = (getItems: CallableFunction) => {
+                    return () => {
+                        return ko.utils.arrayFilter(getItems(), function (item: Equipment) {
                             var elem = ko.unwrap(item);
-                            return elem.isCubedSeason();
+                            return elem.isStashed() && !(elem.isCubedNonSeason() || elem.isCubedSeason());
                         }).length;
-                    }
-                });
+                    };
+                };
 
-                this.WeaponSeasonalCubedCount = ko.computed(() => {
-                    if (self.Weapons().length > 0) {
-                        return ko.utils.arrayFilter(self.Weapons(), function (item: Equipment) {
-                            var elem = ko.unwrap(item);
-                            return elem.isCubedSeason();
+                this.ArmorStashedCount = ko.computed(stashedCount(self.Armor));
+                this.WeaponStashedCount = ko.computed(stashedCount(self.Weapons));
+                this.JewelryStashedCount = ko.computed(stashedCount(self.Jewelry));
+
+                const bothCount = (getItems) => {
+                    return () => {
+                        return ko.utils.arrayFilter(self.Armor(), (item: Equipment) => {
+                            let elem = ko.unwrap(item);
+                            return elem.isCubedNonSeason() || elem.isCubedSeason();
                         }).length;
-                    }
-                });
+                    };
+                };
 
-                this.JewelrySeasonalCubedCount = ko.computed(() => {
-                    if (self.Jewelry().length > 0) {
-                        return ko.utils.arrayFilter(self.Jewelry(), function (item: Equipment) {
-                            var elem = ko.unwrap(item);
-                            return elem.isCubedSeason();
-                        }).length;
-                    }
-                });
-
-                this.ArmorNonSeasonalCubedCount = ko.computed(() => {
-                    if (self.Armor().length > 0) {
-                        return ko.utils.arrayFilter(self.Armor(), function (item: Equipment) {
-                            var elem = ko.unwrap(item);
-                            return elem.isCubedNonSeason();
-                        }).length;
-                    }
-                });
-
-                this.WeaponNonSeasonalCubedCount = ko.computed(() => {
-                    if (self.Weapons().length > 0) {
-                        return ko.utils.arrayFilter(self.Weapons(), function (item: Equipment) {
-                            var elem = ko.unwrap(item);
-                            return elem.isCubedNonSeason();
-                        }).length;
-                    }
-                });
-
-                this.JewelryNonSeasonalCubedCount = ko.computed(() => {
-                    if (self.Jewelry().length > 0) {
-                        return ko.utils.arrayFilter(self.Jewelry(), function (item: Equipment) {
-                            var elem = ko.unwrap(item);
-                            return elem.isCubedNonSeason();
-                        }).length;
-                    }
-                });
-
-                this.ArmorStashedCount = ko.computed(() => {
-                    return ko.utils.arrayFilter(self.Armor(), function (item: Equipment) {
-                        var elem = ko.unwrap(item);
-                        return elem.isStashed() && !(elem.isCubedNonSeason() || elem.isCubedSeason());
-                    }).length;
-                });
-
-                this.WeaponStashedCount = ko.computed(() => {
-                    return ko.utils.arrayFilter(self.Weapons(), function (item: Equipment) {
-                        var elem = ko.unwrap(item);
-                        return elem.isStashed() && !(elem.isCubedNonSeason() || elem.isCubedSeason());
-                    }).length;
-                });
-
-                this.JewelryStashedCount = ko.computed(() => {
-                    return ko.utils.arrayFilter(self.Jewelry(), function (item: Equipment) {
-                        var elem = ko.unwrap(item);
-                        return elem.isStashed() && !(elem.isCubedNonSeason() || elem.isCubedSeason());
-                    }).length;
-                });
-
-                this.ArmorBothCubedCount = ko.computed(() => {
-                    return ko.utils.arrayFilter(self.Armor(), (item: Equipment) => {
-                        var elem = ko.unwrap(item);
-                        return elem.isCubedNonSeason() || elem.isCubedSeason();
-                    }).length;
-                });
-
-                this.WeaponBothCubedCount = ko.computed(() => {
-                    return ko.utils.arrayFilter(self.Weapons(), (item: Equipment) => {
-                        var elem = ko.unwrap(item);
-                        return elem.isCubedNonSeason() || elem.isCubedSeason();
-                    }).length;
-                });
-
-                this.JewelryBothCubedCount = ko.computed(() => {
-                    return ko.utils.arrayFilter(self.Jewelry(), (item: Equipment) => {
-                        var elem = ko.unwrap(item);
-                        return elem.isCubedNonSeason() || elem.isCubedSeason();
-                    }).length;
-                });
+                this.ArmorBothCubedCount = ko.computed(bothCount(self.Armor));
+                this.WeaponBothCubedCount = ko.computed(bothCount(self.Weapons));
+                this.JewelryBothCubedCount = ko.computed(bothCount(self.Jewelry));
 
                 this.StashedCount = ko.computed(() => {
                     return this.JewelryStashedCount() + this.WeaponStashedCount() + this.ArmorStashedCount();
                 });
 
-                this.hideCubed.subscribe(() => { self.saveToLocalStorage(); });
-                this.hideCubedNonSeason.subscribe(() => { self.saveToLocalStorage(); });
-                this.hideNonSeasonalCheckboxes.subscribe(() => { self.saveToLocalStorage(); });
-                this.hideSeasonalCheckboxes.subscribe(() => { self.saveToLocalStorage(); });
-                this.nonSeasonalProgressBar.subscribe(() => { self.saveToLocalStorage(); });
-                this.seasonalProgressBar.subscribe(() => { self.saveToLocalStorage(); });
-                this.bothProgressBar.subscribe(() => { self.saveToLocalStorage(); });
-                this.hasSeenLanguageAlert.subscribe(() => { self.saveToLocalStorage(); });
+                this.hideCubed.subscribe(self.saveToLocalStorage);
+                this.hideCubedNonSeason.subscribe(self.saveToLocalStorage);
+                this.hideNonSeasonalCheckboxes.subscribe(self.saveToLocalStorage);
+                this.hideSeasonalCheckboxes.subscribe(self.saveToLocalStorage);
+                this.nonSeasonalProgressBar.subscribe(self.saveToLocalStorage);
+                this.seasonalProgressBar.subscribe(self.saveToLocalStorage);
+                this.bothProgressBar.subscribe(self.saveToLocalStorage);
+                this.hasSeenLanguageAlert.subscribe(self.saveToLocalStorage);
                 if (!self.selectedLanguage() && !self.showLanguageAlert()) {
                     if (self.hasSeenLanguageAlert()) {
                         self.selectedLanguage(lang.culture());
@@ -432,25 +369,14 @@ module Kanai {
             }
 
             ConvertSeasonalToNon() {
-                for (var item in this.Armor()) {
-                    var thisItem = this.Armor()[item];
-                    if (thisItem.isCubedSeason()) {
-                        thisItem.isCubedNonSeason(true);
-                        thisItem.isCubedSeason(false);
-                    }
-                }
-                for (var item in this.Jewelry()) {
-                    var thisItem = this.Jewelry()[item];
-                    if (thisItem.isCubedSeason()) {
-                        thisItem.isCubedNonSeason(true);
-                        thisItem.isCubedSeason(false);
-                    }
-                }
-                for (var item in this.Weapons()) {
-                    var thisItem = this.Weapons()[item];
-                    if (thisItem.isCubedSeason()) {
-                        thisItem.isCubedNonSeason(true);
-                        thisItem.isCubedSeason(false);
+                const categories = [this.Armor(), this.Jewelry(), this.Weapons()];
+                for (const category of categories) {
+                    for (const item in category) {
+                        const thisItem = category[item];
+                        if (thisItem.isCubedSeason()) {
+                            thisItem.isCubedNonSeason(true);
+                            thisItem.isCubedSeason(false);
+                        }
                     }
                 }
             }
@@ -597,7 +523,7 @@ module Kanai {
             }
 
             checkConsistency() {
-                var self = this;
+                let self = this;
                 this.loadWeapons(this.AllWeapons);
                 this.loadJewelry(this.AllJewelry);
                 this.loadArmor(this.AllArmor);
@@ -607,7 +533,7 @@ module Kanai {
 
                 //This item accidently made it to the US item list
                 if (lang.culture() != 'de' || lang.culture() != 'de-DE') {
-                    item = ko.utils.arrayFirst(self.Armor(), function (item: any) {
+                    let item = ko.utils.arrayFirst(self.Armor(), function (item: any) {
                         return item.itemName() == "Eiskletterer";
                     });
                     if (item) {

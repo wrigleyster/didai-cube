@@ -1,3 +1,4 @@
+"use strict";
 /// <reference path="../knockout.d.ts"/>
 /// <reference path="../knockout.mapping.d.ts"/>
 /// <reference path="../jquery.d.ts"/>
@@ -6,21 +7,20 @@
 /// <reference path="../includes.d.ts"/>
 var Kanai;
 (function (Kanai) {
-    var Models;
+    let Models;
     (function (Models) {
-        var DropdownListOption = (function () {
-            function DropdownListOption(key, value) {
+        class DropdownListOption {
+            constructor(key, value) {
                 this.key = key;
                 this.value = value;
             }
-            return DropdownListOption;
-        }());
+        }
         Models.DropdownListOption = DropdownListOption;
     })(Models = Kanai.Models || (Kanai.Models = {}));
-    var VM;
+    let VM;
     (function (VM) {
-        var Site = (function () {
-            function Site() {
+        class Site {
+            constructor() {
                 this.localStorageString = "kanai_cube";
                 var self = this;
                 this.CurrentPatchVersion = "2.4.1";
@@ -42,7 +42,7 @@ var Kanai;
                 this.Search = ko.observable('').extend({ notify: 'always', rateLimit: 200 });
                 this.UserPatchVersion = ko.observable('');
                 this.FilteredArray = ko.observableArray([]);
-                this.Search.subscribe(function (searchText) {
+                this.Search.subscribe((searchText) => {
                     if (searchText && searchText.length >= 2) {
                         //we need to search the array
                         self.FilteredArray([]);
@@ -63,17 +63,17 @@ var Kanai;
                     }
                 });
                 this.selectedLanguage = ko.observable('default');
-                this.selectedLanguage.subscribe(function (newLang) {
+                this.selectedLanguage.subscribe((newLang) => {
                     lang.selectedLang(newLang);
                 });
                 this.hasSeenLanguageAlert = ko.observable(false);
                 this.hasSeenUpdateNotice = ko.observable(false);
-                this.hasSeenUpdateNotice.subscribe(function (newVal) {
+                this.hasSeenUpdateNotice.subscribe((newVal) => {
                     if (newVal === true) {
                         self.UserPatchVersion(self.CurrentPatchVersion);
                     }
                 });
-                this.showLanguageAlert = ko.computed(function () {
+                this.showLanguageAlert = ko.computed(() => {
                     switch (lang.culture()) {
                         case "de-DE":
                         case "de":
@@ -87,8 +87,8 @@ var Kanai;
                     }
                 });
             }
-            Site.prototype.searchArray = function (array, searchText, response) {
-                var res = ko.utils.arrayFilter(array(), function (item) {
+            searchArray(array, searchText, response) {
+                var res = ko.utils.arrayFilter(array(), (item) => {
                     var lowerItemName, lowerAffix;
                     if (ko.isObservable(item)) {
                         item = item();
@@ -99,19 +99,18 @@ var Kanai;
                 });
                 ko.utils.arrayPushAll(response(), res);
                 return res.length > 0;
-            };
-            Site.prototype.clear = function () {
+            }
+            clear() {
                 this.Weapons([]);
                 this.Jewelry([]);
                 this.Armor([]);
                 this.selectedLanguage('default');
                 this.hasSeenLanguageAlert(false);
                 this.hasSeenUpdateNotice(true);
-            };
-            Site.prototype.convertGermanItemsToEnglish = function () {
-            };
-            Site.prototype.init = function () {
-                var _this = this;
+            }
+            convertGermanItemsToEnglish() {
+            }
+            init() {
                 var self = this;
                 var vm = JSON.parse(localStorage.getItem(self.localStorageString));
                 if (!vm) {
@@ -137,35 +136,35 @@ var Kanai;
                         return left().itemName() == right().itemName() ? 0 : (left().itemName() < right().itemName() ? -1 : 1);
                     });
                     $.each(self.Armor(), function (i, elem) {
-                        elem().isCubedSeason.subscribe(function (newValue) {
+                        elem().isCubedSeason.subscribe((newValue) => {
                             self.saveToLocalStorage();
                         });
-                        elem().isCubedNonSeason.subscribe(function (newValue) {
+                        elem().isCubedNonSeason.subscribe((newValue) => {
                             self.saveToLocalStorage();
                         });
-                        elem().isStashed.subscribe(function (newValue) {
+                        elem().isStashed.subscribe((newValue) => {
                             self.saveToLocalStorage();
                         });
                     });
                     $.each(self.Weapons(), function (i, elem) {
-                        elem().isCubedSeason.subscribe(function (newValue) {
+                        elem().isCubedSeason.subscribe((newValue) => {
                             self.saveToLocalStorage();
                         });
-                        elem().isCubedNonSeason.subscribe(function (newValue) {
+                        elem().isCubedNonSeason.subscribe((newValue) => {
                             self.saveToLocalStorage();
                         });
-                        elem().isStashed.subscribe(function (newValue) {
+                        elem().isStashed.subscribe((newValue) => {
                             self.saveToLocalStorage();
                         });
                     });
                     $.each(self.Jewelry(), function (i, elem) {
-                        elem().isCubedSeason.subscribe(function (newValue) {
+                        elem().isCubedSeason.subscribe((newValue) => {
                             self.saveToLocalStorage();
                         });
-                        elem().isCubedNonSeason.subscribe(function (newValue) {
+                        elem().isCubedNonSeason.subscribe((newValue) => {
                             self.saveToLocalStorage();
                         });
-                        elem().isStashed.subscribe(function (newValue) {
+                        elem().isStashed.subscribe((newValue) => {
                             self.saveToLocalStorage();
                         });
                     });
@@ -221,192 +220,126 @@ var Kanai;
                     }, self);
                     this.checkConsistency();
                     this.saveToLocalStorage();
-                    $.each(self.Armor(), function (i, elem) {
-                        elem.isCubedSeason.subscribe(function (newValue) {
+                    const save = (i, elem) => {
+                        elem.isCubedSeason.subscribe((newValue) => {
                             self.saveToLocalStorage();
                         });
-                        elem.isCubedNonSeason.subscribe(function (newValue) {
+                        elem.isCubedNonSeason.subscribe((newValue) => {
                             self.saveToLocalStorage();
                         });
-                        elem.isStashed.subscribe(function (newValue) {
+                        elem.isStashed.subscribe((newValue) => {
                             self.saveToLocalStorage();
                         });
-                    });
-                    $.each(self.Weapons(), function (i, elem) {
-                        elem.isCubedSeason.subscribe(function (newValue) {
-                            self.saveToLocalStorage();
-                        });
-                        elem.isCubedNonSeason.subscribe(function (newValue) {
-                            self.saveToLocalStorage();
-                        });
-                        elem.isStashed.subscribe(function (newValue) {
-                            self.saveToLocalStorage();
-                        });
-                    });
-                    $.each(self.Jewelry(), function (i, elem) {
-                        elem.isCubedSeason.subscribe(function (newValue) {
-                            self.saveToLocalStorage();
-                        });
-                        elem.isCubedNonSeason.subscribe(function (newValue) {
-                            self.saveToLocalStorage();
-                        });
-                        elem.isStashed.subscribe(function (newValue) {
-                            self.saveToLocalStorage();
-                        });
-                    });
+                    };
+                    $.each(self.Armor(), save);
+                    $.each(self.Weapons(), save);
+                    $.each(self.Jewelry(), save);
                     this.saveToLocalStorage();
                 }
-                this.ArmorSeasonalCubedCount = ko.computed(function () {
-                    if (self.Armor().length > 0) {
-                        return ko.utils.arrayFilter(self.Armor(), function (item) {
+                const seasonalCount = (getItems) => {
+                    return () => {
+                        if (getItems().length > 0) {
+                            return ko.utils.arrayFilter(getItems(), function (item) {
+                                const elem = ko.unwrap(item);
+                                return elem.isCubedSeason();
+                            }).length;
+                        }
+                    };
+                };
+                this.ArmorSeasonalCubedCount = ko.computed(seasonalCount(self.Armor));
+                this.WeaponSeasonalCubedCount = ko.computed(seasonalCount(self.Weapons));
+                this.JewelrySeasonalCubedCount = ko.computed(seasonalCount(self.Jewelry));
+                const nonSeasonalCount = (getItems) => {
+                    return () => {
+                        if (getItems().length > 0) {
+                            return ko.utils.arrayFilter(getItems(), function (item) {
+                                const elem = ko.unwrap(item);
+                                return elem.isCubedNonSeason();
+                            }).length;
+                        }
+                    };
+                };
+                this.ArmorNonSeasonalCubedCount = ko.computed(nonSeasonalCount(self.Armor));
+                this.WeaponNonSeasonalCubedCount = ko.computed(nonSeasonalCount(self.Weapons));
+                this.JewelryNonSeasonalCubedCount = ko.computed(nonSeasonalCount(self.Jewelry));
+                const stashedCount = (getItems) => {
+                    return () => {
+                        return ko.utils.arrayFilter(getItems(), function (item) {
                             var elem = ko.unwrap(item);
-                            return elem.isCubedSeason();
+                            return elem.isStashed() && !(elem.isCubedNonSeason() || elem.isCubedSeason());
                         }).length;
-                    }
-                });
-                this.WeaponSeasonalCubedCount = ko.computed(function () {
-                    if (self.Weapons().length > 0) {
-                        return ko.utils.arrayFilter(self.Weapons(), function (item) {
-                            var elem = ko.unwrap(item);
-                            return elem.isCubedSeason();
+                    };
+                };
+                this.ArmorStashedCount = ko.computed(stashedCount(self.Armor));
+                this.WeaponStashedCount = ko.computed(stashedCount(self.Weapons));
+                this.JewelryStashedCount = ko.computed(stashedCount(self.Jewelry));
+                const bothCount = (getItems) => {
+                    return () => {
+                        return ko.utils.arrayFilter(self.Armor(), (item) => {
+                            let elem = ko.unwrap(item);
+                            return elem.isCubedNonSeason() || elem.isCubedSeason();
                         }).length;
-                    }
+                    };
+                };
+                this.ArmorBothCubedCount = ko.computed(bothCount(self.Armor));
+                this.WeaponBothCubedCount = ko.computed(bothCount(self.Weapons));
+                this.JewelryBothCubedCount = ko.computed(bothCount(self.Jewelry));
+                this.StashedCount = ko.computed(() => {
+                    return this.JewelryStashedCount() + this.WeaponStashedCount() + this.ArmorStashedCount();
                 });
-                this.JewelrySeasonalCubedCount = ko.computed(function () {
-                    if (self.Jewelry().length > 0) {
-                        return ko.utils.arrayFilter(self.Jewelry(), function (item) {
-                            var elem = ko.unwrap(item);
-                            return elem.isCubedSeason();
-                        }).length;
-                    }
-                });
-                this.ArmorNonSeasonalCubedCount = ko.computed(function () {
-                    if (self.Armor().length > 0) {
-                        return ko.utils.arrayFilter(self.Armor(), function (item) {
-                            var elem = ko.unwrap(item);
-                            return elem.isCubedNonSeason();
-                        }).length;
-                    }
-                });
-                this.WeaponNonSeasonalCubedCount = ko.computed(function () {
-                    if (self.Weapons().length > 0) {
-                        return ko.utils.arrayFilter(self.Weapons(), function (item) {
-                            var elem = ko.unwrap(item);
-                            return elem.isCubedNonSeason();
-                        }).length;
-                    }
-                });
-                this.JewelryNonSeasonalCubedCount = ko.computed(function () {
-                    if (self.Jewelry().length > 0) {
-                        return ko.utils.arrayFilter(self.Jewelry(), function (item) {
-                            var elem = ko.unwrap(item);
-                            return elem.isCubedNonSeason();
-                        }).length;
-                    }
-                });
-                this.ArmorStashedCount = ko.computed(function () {
-                    return ko.utils.arrayFilter(self.Armor(), function (item) {
-                        var elem = ko.unwrap(item);
-                        return elem.isStashed() && !(elem.isCubedNonSeason() || elem.isCubedSeason());
-                    }).length;
-                });
-                this.WeaponStashedCount = ko.computed(function () {
-                    return ko.utils.arrayFilter(self.Weapons(), function (item) {
-                        var elem = ko.unwrap(item);
-                        return elem.isStashed() && !(elem.isCubedNonSeason() || elem.isCubedSeason());
-                    }).length;
-                });
-                this.JewelryStashedCount = ko.computed(function () {
-                    return ko.utils.arrayFilter(self.Jewelry(), function (item) {
-                        var elem = ko.unwrap(item);
-                        return elem.isStashed() && !(elem.isCubedNonSeason() || elem.isCubedSeason());
-                    }).length;
-                });
-                this.ArmorBothCubedCount = ko.computed(function () {
-                    return ko.utils.arrayFilter(self.Armor(), function (item) {
-                        var elem = ko.unwrap(item);
-                        return elem.isCubedNonSeason() || elem.isCubedSeason();
-                    }).length;
-                });
-                this.WeaponBothCubedCount = ko.computed(function () {
-                    return ko.utils.arrayFilter(self.Weapons(), function (item) {
-                        var elem = ko.unwrap(item);
-                        return elem.isCubedNonSeason() || elem.isCubedSeason();
-                    }).length;
-                });
-                this.JewelryBothCubedCount = ko.computed(function () {
-                    return ko.utils.arrayFilter(self.Jewelry(), function (item) {
-                        var elem = ko.unwrap(item);
-                        return elem.isCubedNonSeason() || elem.isCubedSeason();
-                    }).length;
-                });
-                this.StashedCount = ko.computed(function () {
-                    return _this.JewelryStashedCount() + _this.WeaponStashedCount() + _this.ArmorStashedCount();
-                });
-                this.hideCubed.subscribe(function () { self.saveToLocalStorage(); });
-                this.hideCubedNonSeason.subscribe(function () { self.saveToLocalStorage(); });
-                this.hideNonSeasonalCheckboxes.subscribe(function () { self.saveToLocalStorage(); });
-                this.hideSeasonalCheckboxes.subscribe(function () { self.saveToLocalStorage(); });
-                this.nonSeasonalProgressBar.subscribe(function () { self.saveToLocalStorage(); });
-                this.seasonalProgressBar.subscribe(function () { self.saveToLocalStorage(); });
-                this.bothProgressBar.subscribe(function () { self.saveToLocalStorage(); });
-                this.hasSeenLanguageAlert.subscribe(function () { self.saveToLocalStorage(); });
+                this.hideCubed.subscribe(self.saveToLocalStorage);
+                this.hideCubedNonSeason.subscribe(self.saveToLocalStorage);
+                this.hideNonSeasonalCheckboxes.subscribe(self.saveToLocalStorage);
+                this.hideSeasonalCheckboxes.subscribe(self.saveToLocalStorage);
+                this.nonSeasonalProgressBar.subscribe(self.saveToLocalStorage);
+                this.seasonalProgressBar.subscribe(self.saveToLocalStorage);
+                this.bothProgressBar.subscribe(self.saveToLocalStorage);
+                this.hasSeenLanguageAlert.subscribe(self.saveToLocalStorage);
                 if (!self.selectedLanguage() && !self.showLanguageAlert()) {
                     if (self.hasSeenLanguageAlert()) {
                         self.selectedLanguage(lang.culture());
                     }
                 }
-            };
-            Site.prototype.ConvertSeasonalToNon = function () {
-                for (var item in this.Armor()) {
-                    var thisItem = this.Armor()[item];
-                    if (thisItem.isCubedSeason()) {
-                        thisItem.isCubedNonSeason(true);
-                        thisItem.isCubedSeason(false);
+            }
+            ConvertSeasonalToNon() {
+                const categories = [this.Armor(), this.Jewelry(), this.Weapons()];
+                for (const category of categories) {
+                    for (const item in category) {
+                        const thisItem = category[item];
+                        if (thisItem.isCubedSeason()) {
+                            thisItem.isCubedNonSeason(true);
+                            thisItem.isCubedSeason(false);
+                        }
                     }
                 }
-                for (var item in this.Jewelry()) {
-                    var thisItem = this.Jewelry()[item];
-                    if (thisItem.isCubedSeason()) {
-                        thisItem.isCubedNonSeason(true);
-                        thisItem.isCubedSeason(false);
-                    }
-                }
-                for (var item in this.Weapons()) {
-                    var thisItem = this.Weapons()[item];
-                    if (thisItem.isCubedSeason()) {
-                        thisItem.isCubedNonSeason(true);
-                        thisItem.isCubedSeason(false);
-                    }
-                }
-            };
-            Site.prototype.UpdateForNewPatch = function () {
+            }
+            UpdateForNewPatch() {
                 this.hasSeenUpdateNotice(true);
                 this.ConvertSeasonalToNon();
                 this.UserPatchVersion(this.CurrentPatchVersion);
                 this.saveToLocalStorage();
-            };
-            Site.prototype.DontUpdateForNewPatch = function () {
+            }
+            DontUpdateForNewPatch() {
                 this.hasSeenUpdateNotice(true);
                 this.UserPatchVersion(this.CurrentPatchVersion);
                 this.saveToLocalStorage();
-            };
-            Site.prototype.Translate = function () {
+            }
+            Translate() {
                 this.hasSeenLanguageAlert(true);
                 this.selectedLanguage(lang.culture());
                 this.saveToLocalStorage();
                 this.init();
-            };
-            Site.prototype.DontTranslate = function () {
+            }
+            DontTranslate() {
                 this.selectedLanguage('default');
                 this.hasSeenLanguageAlert(true);
                 this.init();
-            };
-            Site.prototype.fillExport = function () {
+            }
+            fillExport() {
                 var self = this;
                 this.Export(ko.mapping.toJSON(self));
-            };
-            Site.prototype.saveToLocalStorage = function () {
+            }
+            saveToLocalStorage() {
                 var self = this;
                 localStorage[self.localStorageString] = null;
                 delete this.Jewelery;
@@ -433,9 +366,9 @@ var Kanai;
                         "showLanguageAlert"
                     ]
                 }));
-            };
+            }
             // This function will return correct spelling of words that I typoed at some time without destroying user data or duplicating records
-            Site.prototype.spellcheckCorrect = function (searchName) {
+            spellcheckCorrect(searchName) {
                 switch (searchName) {
                     case "Gundo Gear":
                         return { oldName: "Gundo Gear", newName: "Gungdo Gear" };
@@ -451,8 +384,8 @@ var Kanai;
                         return { oldName: "Chaigmail", newName: "Chaingmail" };
                 }
                 return null;
-            };
-            Site.prototype._checkConsistencyAndSort = function (searchArray, masterList) {
+            }
+            _checkConsistencyAndSort(searchArray, masterList) {
                 var self = this;
                 for (var i = 0; i < searchArray().length; i++) {
                     var convert;
@@ -496,8 +429,8 @@ var Kanai;
                 searchArray.sort(function (left, right) {
                     return left.itemName() == right.itemName() ? 0 : (left.itemName() < right.itemName() ? -1 : 1);
                 });
-            };
-            Site.prototype.importValues = function () {
+            }
+            importValues() {
                 var self = this;
                 if (self.Import()) {
                     if (confirm(lang.importConfirm())) {
@@ -510,9 +443,9 @@ var Kanai;
                         self.saveToLocalStorage();
                     }
                 }
-            };
-            Site.prototype.checkConsistency = function () {
-                var self = this;
+            }
+            checkConsistency() {
+                let self = this;
                 this.loadWeapons(this.AllWeapons);
                 this.loadJewelry(this.AllJewelry);
                 this.loadArmor(this.AllArmor);
@@ -520,7 +453,7 @@ var Kanai;
                 self._checkConsistencyAndSort(self.Weapons, self.AllWeapons());
                 //This item accidently made it to the US item list
                 if (lang.culture() != 'de' || lang.culture() != 'de-DE') {
-                    item = ko.utils.arrayFirst(self.Armor(), function (item) {
+                    let item = ko.utils.arrayFirst(self.Armor(), function (item) {
                         return item.itemName() == "Eiskletterer";
                     });
                     if (item) {
@@ -529,26 +462,25 @@ var Kanai;
                 }
                 self._checkConsistencyAndSort(self.Jewelry, self.AllJewelry());
                 self.saveToLocalStorage();
-            };
-            Site.prototype.loadFromLocalStorage = function (vm) {
+            }
+            loadFromLocalStorage(vm) {
                 this.Armor = vm.Armor;
                 this.Weapons = vm.Weapons;
                 this.Jewelry = vm.Jewelry;
-            };
-            Site.prototype.loadArmor = function (target) {
+            }
+            loadArmor(target) {
                 target([]);
                 lang.getArmor(target);
-            };
-            Site.prototype.loadWeapons = function (target) {
+            }
+            loadWeapons(target) {
                 target([]);
                 lang.getWeapons(target);
-            };
-            Site.prototype.loadJewelry = function (target) {
+            }
+            loadJewelry(target) {
                 target([]);
                 lang.getJewelry(target);
-            };
-            return Site;
-        }());
+            }
+        }
         VM.Site = Site;
     })(VM = Kanai.VM || (Kanai.VM = {}));
 })(Kanai || (Kanai = {}));

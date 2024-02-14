@@ -1,8 +1,9 @@
+"use strict";
 var Kanai;
 (function (Kanai) {
-    var Enums;
+    let Enums;
     (function (Enums) {
-        var Restrictions;
+        let Restrictions;
         (function (Restrictions) {
             Restrictions[Restrictions["All"] = 0] = "All";
             Restrictions[Restrictions["Barbarian"] = 1] = "Barbarian";
@@ -14,4 +15,3 @@ var Kanai;
         })(Restrictions = Enums.Restrictions || (Enums.Restrictions = {}));
     })(Enums = Kanai.Enums || (Kanai.Enums = {}));
 })(Kanai || (Kanai = {}));
-//# sourceMappingURL=restrictions.js.map
